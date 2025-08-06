@@ -31,6 +31,8 @@ public class FileScanService {
     private FileCategoryService categoryService;
 
     private final Map<String, ScanResult> scanResults = new HashMap<>();
+    private final List<String> recentDirectories = new ArrayList<>();
+    private final int MAX_RECENT_DIRECTORIES = 10;
 
     public String startScan(String directory) {
         String scanId = UUID.randomUUID().toString();
@@ -39,6 +41,10 @@ public class FileScanService {
         try {
             ScanResult scanResult = performScan(scanId, directory);
             scanResults.put(scanId, scanResult);
+            
+            // Add to recent directories
+            addToRecentDirectories(directory);
+            
             logger.info("Scan completed successfully for scanId: {}", scanId);
             return scanId;
         } catch (Exception e) {
@@ -166,5 +172,22 @@ public class FileScanService {
         }
         
         return allDeleted;
+    }
+
+    private void addToRecentDirectories(String directory) {
+        // Remove if already exists to avoid duplicates
+        recentDirectories.remove(directory);
+        
+        // Add to the beginning
+        recentDirectories.add(0, directory);
+        
+        // Keep only the most recent directories
+        if (recentDirectories.size() > MAX_RECENT_DIRECTORIES) {
+            recentDirectories.remove(recentDirectories.size() - 1);
+        }
+    }
+
+    public List<String> getRecentDirectories() {
+        return new ArrayList<>(recentDirectories);
     }
 }

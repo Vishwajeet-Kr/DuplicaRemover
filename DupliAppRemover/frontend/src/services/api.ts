@@ -33,6 +33,16 @@ export const scanService = {
     return response.data;
   },
 
+  async validateDirectory(directory: string): Promise<{ valid: boolean; message: string }> {
+    const response = await api.post('/validate-directory', { directory });
+    return response.data;
+  },
+
+  async getRecentDirectories(): Promise<{ directories: string[] }> {
+    const response = await api.get('/recent-directories');
+    return response.data;
+  },
+
   async checkHealth(): Promise<string> {
     const response = await api.get('/health');
     return response.data;
